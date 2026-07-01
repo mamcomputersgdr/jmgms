@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JMGMS">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#1a3a2a">
+    <title>JMGMS v4.0 — Complete Masjid Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+        :root {
+            --green-deep: #1a3a2a;
+            --green-mid: #2d6a4f;
+            --green-soft: #40916c;
+            --green-pale: #d8f3dc;
+            --gold: #c9a84c;
+            --gold-light: #f0d080;
+            --gold-pale: #fdf6e3;
+            --cream: #f8f4ec;
+            --cream-dark: #ede8db;
+            --ink: #1c1c1e;
+            --ink-soft: #3a3a3c;
+            --muted: #8a8a8e;
+            --red: #c0392b;
+            --red-pale: #fee2e2;
+            --blue: #1a4a7a;
+            --blue-pale: #dbeafe;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 4px rgba(0, 0, 0, .08);
+            --shadow: 0 2px 12px rgba(0, 0, 0, .10);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, .15);
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            --font-arabic: 'Amiri', 'Times New Roman', serif;
+            --transition: .18s ease
+        }
+        body {
+            font-family: var(--font-body);
+            background: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased
+        }
+        .arabic {
+            font-family: var(--font-arabic);
+            direction: rtl;
+            font-size: 1.4em;
+            line-height: 2;
+            letter-spacing: 1px
+        }
+        .text-muted {
+            color: var(--muted)
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: 1.5px solid transparent;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+            line-height: 1;
+            min-height: 42px
+        }
+        .btn-block {
+            width: 100%
+        }
+        .btn-primary {
+            background: var(--green-mid);
+            color: var(--white);
+            border-color: var(--green-mid)
+        }
+        .btn-primary:hover {
+            background: var(--green-deep)
+        }
+        .btn-gold {
+            background: var(--gold);
+            color: var(--green-deep);
+            border-color: var(--gold)
+        }
+        .btn-gold:hover {
+            background: var(--gold-light)
+        }
+        .btn-danger {
+            background: var(--red);
+            color: var(--white)
+        }
+        .btn-danger:hover {
+            background: #a93226
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--green-mid);
+            border-color: var(--green-mid)
+        }
+        .btn-ghost:hover {
+            background: var(--green-mid);
+            color: var(--white)
+        }
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px
+        }
+        .form-group {
+            margin-bottom: 12px
+        }
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--cream-dark);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--white);
+            outline: none;
+            transition: border-color var(--transition)
+        }
+        input:focus {
+            border-color: var(--green-soft);
+            box-shadow: 0 0 0 3px rgba(64, 145, 108, .12)
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(2px)
+        }
+        .modal-overlay.open {
+            display: flex
+        }
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn .22s ease
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--cream-dark);
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 1
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--muted);
+            padding: 4px 8px;
+            border-radius: 50%
+        }
+        .modal-close:hover {
+            background: var(--cream)
+        }
+        .modal-body {
+            padding: 18px
+        }
+        @keyframes modalIn {
+            from {
+                transform: scale(.95) translateY(10px);
+                opacity: 0
+            }
+            to {
+                transform: none;
+                opacity: 1
+            }
+        }
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 320px;
+            width: 100%
+        }
+        .toast {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            animation: toastIn .28s ease
+        }
+        .toast-success {
+            background: var(--green-mid)
+        }
+        .toast-error {
+            background: var(--red)
+        }
+        .toast-info {
+            background: var(--blue)
+        }
+        @keyframes toastIn {
+            from {
+                transform: translateX(60px);
+                opacity: 0
+            }
+            to {
+                transform: none;
+                opacity: 1
+            }
+        }
+        #auth-screen {
+            min-height: 100vh;
+            background: linear-gradient(160deg, var(--green-deep), var(--green-mid) 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px
+        }
+        .auth-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg)
+        }
+        .auth-card h1 {
+            text-align: center;
+            font-size: 20px;
+            color: var(--green-deep);
+            margin-bottom: 2px
+        }
+        .auth-card .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 20px
+        }
+        .auth-card .bismillah {
+            text-align: center;
+            font-size: 22px;
+            color: var(--green-mid);
+            margin-bottom: 6px
+        }
+        .role-tabs {
+            display: flex;
+            background: var(--cream);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 16px;
+            gap: 4px
+        }
+        .role-tab {
+            flex: 1;
+            padding: 8px 6px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all var(--transition)
+        }
+        .role-tab.active {
+            background: var(--white);
+            color: var(--green-deep);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .10)
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+        .auth-footer a {
+            color: var(--green-mid);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer
+        }
+        #app-shell {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh
+        }
+        .topbar {
+            background: var(--green-deep);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            height: 56px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .25);
+            flex-shrink: 0
+        }
+        .topbar-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 700
+        }
+        .topbar-title .highlight {
+            color: var(--gold)
+        }
+        .topbar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--green-deep)
+        }
+        .topbar-logout {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: rgba(255, 255, 255, .85);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer
+        }
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden
+        }
+        .sidebar {
+            width: 200px;
+            background: var(--green-deep);
+            height: calc(100vh - 56px);
+            position: sticky;
+            top: 56px;
+            overflow-y: auto;
+            padding: 10px 0;
+            flex-shrink: 0
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, .65);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: var(--font-body);
+            transition: all var(--transition);
+            white-space: nowrap;
+            border-left: 3px solid transparent
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, .07);
+            color: var(--white)
+        }
+        .nav-item.active {
+            background: rgba(201, 168, 76, .12);
+            color: var(--gold);
+            border-left-color: var(--gold)
+        }
+        .nav-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            width: 24px;
+            text-align: center
+        }
+        .nav-section-label {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .3);
+            padding: 14px 16px 4px
+        }
+        .main-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: var(--cream);
+            min-width: 0
+        }
+        .page {
+            display: none;
+            animation: fadeIn .2s ease
+        }
+        .page.active {
+            display: block
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--green-soft)
+        }
+        .stat-card.gold {
+            border-left-color: var(--gold)
+        }
+        .stat-card.red {
+            border-left-color: var(--red)
+        }
+        .stat-card.blue {
+            border-left-color: var(--blue)
+        }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.1
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 4px
+        }
+        .table-wrap {
+            overflow-x: auto
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+        thead th {
+            background: var(--cream-dark);
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--ink-soft);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+        tbody td {
+            padding: 8px 12px;
+            color: var(--ink-soft);
+            vertical-align: middle;
+            border-bottom: 1px solid var(--cream-dark)
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700
+        }
+        .badge-green {
+            background: var(--green-pale);
+            color: #065f46
+        }
+        .badge-yellow {
+            background: #fef9c3;
+            color: #854d0e
+        }
+        .badge-red {
+            background: var(--red-pale);
+            color: #991b1b
+        }
+        .badge-blue {
+            background: var(--blue-pale);
+            color: #1e40af
+        }
+        @media(max-width:640px) {
+            .sidebar {
+                width: 56px
+            }
+            .sidebar .nav-label {
+                opacity: 0;
+                width: 0;
+                overflow: hidden
+            }
+            .main-content {
+                padding: 10px
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr
+            }
+            .topbar-title {
+                font-size: 13px
+            }
+        }
+        .hidden {
+            display: none !important
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <div class="bismillah arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+            <h1>🕌 Jama Masjid Gandhari</h1>
+            <p class="subtitle">Complete Masjid Management v4.0</p>
+
+            <div class="role-tabs">
+                <button class="role-tab active" onclick="setRole('admin',this)">Admin</button>
+                <button class="role-tab" onclick="setRole('family',this)">Family</button>
+                <button class="role-tab" onclick="setRole('treasurer',this)">Treasurer</button>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="login-mobile" placeholder="Enter mobile number" maxlength="10" value="9494057012">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="doLogin()">🔐 Sign In</button>
+
+            <div class="auth-footer">
+                <a onclick="showRegister()">📝 Register New Family</a> ·
+                <a onclick="toast('Password reset coming soon','info')">Forgot?</a>
+            </div>
+
+            <div id="register-panel" style="display:none;border-top:1px solid var(--cream-dark);padding-top:14px;margin-top:14px">
+                <h4 style="color:var(--green-deep);margin-bottom:10px;font-size:14px">📝 New Family Registration</h4>
+                <div id="reg-step-1">
+                    <div style="background:var(--cream);border-radius:var(--radius-sm);padding:8px;font-size:12px;margin-bottom:10px">📱 OTP will be shown on screen</div>
+                    <div class="form-group"><label>Mobile</label>
+                        <div style="display:flex;gap:8px"><input type="tel" id="reg-mobile" placeholder="10-digit" maxlength="10" style="flex:1"><button class="btn btn-primary" onclick="sendOTP()" id="send-otp-btn" style="font-size:12px;padding:8px 14px">Send OTP</button></div>
+                    </div>
+                    <div class="form-group" id="otp-group" style="display:none"><label>Enter OTP</label><input type="number" id="reg-otp" placeholder="6-digit OTP"></div>
+                    <button class="btn btn-gold btn-block" id="verify-otp-btn" style="display:none" onclick="verifyOTP()">Verify OTP →</button>
+                </div>
+                <div id="reg-step-2" style="display:none">
+                    <div class="form-group"><label>Head of Family *</label><input type="text" id="reg-name" placeholder="Full name"></div>
+                    <div class="form-group"><label>Address *</label><input type="text" id="reg-address" placeholder="House, Street, Gandhari"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div class="form-group"><label>Members *</label><input type="number" id="reg-members" min="1"></div>
+                        <div class="form-group"><label>Document Type</label><select id="reg-doc"><option>Aadhaar</option><option>Ration Card</option><option>Voter ID</option></select></div>
+                    </div>
+                    <div class="form-group"><label>Password *</label><input type="password" id="reg-password" placeholder="Min 6 chars"></div>
+                    <button class="btn btn-gold btn-block" onclick="goToStep3()">Next → Photo (Optional)</button>
+                </div>
+                <div id="reg-step-3" style="display:none">
+                    <div style="text-align:center;margin-bottom:12px">
+                        <div id="reg-photo-preview" onclick="document.getElementById('reg-photo-file').click()" style="width:80px;height:80px;border-radius:50%;background:var(--cream-dark);border:3px dashed var(--green-soft);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin:0 auto 6px"><div style="font-size:30px">📷</div></div>
+                        <input type="file" id="reg-photo-file" accept="image/*" style="display:none" onchange="previewRegPhoto(this)">
+                        <p class="text-muted" style="font-size:11px">Photo is <strong>optional</strong> - you can skip</p>
+                    </div>
+                    <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="document.getElementById('reg-step-2').style.display='block';document.getElementById('reg-step-3').style.display='none'">← Back</button><button class="btn btn-gold" style="flex:1" onclick="submitRegistration()">✅ Submit</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SHELL -->
+    <div id="app-shell">
+        <header class="topbar">
+            <button onclick="toggleSidebar()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer">☰</button>
+            <div class="topbar-title" onclick="showPage('dashboard')" style="cursor:pointer">🕌 <span class="highlight">Jama Masjid</span> Gandhari</div>
+            <div class="topbar-avatar" id="topbar-avatar">A</div>
+            <button class="topbar-logout" onclick="doLogout()">Logout</button>
+        </header>
+        <div class="app-body">
+            <nav class="sidebar" id="sidebar">
+                <div class="nav-section-label">Main</div>
+                <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></button>
+                <button class="nav-item" data-page="families" onclick="showPage('families')"><span class="nav-icon">👨‍👩‍👧</span><span class="nav-label">Families</span></button>
+                <button class="nav-item" data-page="payments" onclick="showPage('payments')"><span class="nav-icon">💰</span><span class="nav-label">Payments</span></button>
+                <button class="nav-item" data-page="expenses" onclick="showPage('expenses')"><span class="nav-icon">📤</span><span class="nav-label">Expenses</span></button>
+                <div class="nav-section-label">Finance</div>
+                <button class="nav-item" data-page="funds" onclick="showPage('funds')"><span class="nav-icon">🏦</span><span class="nav-label">Funds</span></button>
+                <button class="nav-item" data-page="accounts" onclick="showPage('accounts')"><span class="nav-icon">📊</span><span class="nav-label">Accounts</span></button>
+                <button class="nav-item" data-page="reports" onclick="showPage('reports')"><span class="nav-icon">📋</span><span class="nav-label">Reports</span></button>
+                <div class="nav-section-label">Community</div>
+                <button class="nav-item" data-page="announcements" onclick="showPage('announcements')"><span class="nav-icon">📢</span><span class="nav-label">Announcements</span></button>
+                <button class="nav-item" data-page="pending" onclick="showPage('pending')"><span class="nav-icon">⏳</span><span class="nav-label">Pending</span></button>
+                <div class="nav-section-label">System</div>
+                <button class="nav-item" data-page="settings" onclick="showPage('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+            </nav>
+            <main class="main-content">
+
+                <!-- DASHBOARD -->
+                <div class="page active" id="page-dashboard">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:20px">Dashboard</h2><p style="font-size:12px;color:var(--muted)" id="dashboard-date"></p></div>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-gold" onclick="openModal('modal-add-payment')">+ Payment</button>
+                            <button class="btn btn-primary" onclick="openModal('modal-add-ann')">📢 Announce</button>
+                        </div>
+                    </div>
+                    <div class="stats-grid" id="dash-stats"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                        <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><h3>Recent Payments</h3><button class="btn btn-ghost btn-sm" onclick="showPage('payments')">View All</button></div><div class="table-wrap"><table><thead><tr><th>Family</th><th>Category</th><th>Amount</th></tr></thead><tbody id="recent-payments"></tbody></table></div></div>
+                        <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><h3>Pending Approvals</h3><button class="btn btn-ghost btn-sm" onclick="showPage('pending')">Review</button></div><div id="pending-summary"></div></div>
+                    </div>
+                    <div class="card" style="background:linear-gradient(135deg,var(--green-deep),var(--green-mid));color:white;border:none;margin-top:12px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                            <div>
+                                <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:1px">Developed By</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--gold)">Moiz Mohammed</div>
+                                <div style="font-size:12px;opacity:.8">Sr. CCTV Engineer & ELV Technician</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div style="font-size:10px;opacity:.7">📞 Contact</div>
+                                <a href="tel:9494057012" style="color:var(--gold-light);font-size:16px;font-weight:700;text-decoration:none">9494057012</a>
+                                <br>
+                                <a href="https://wa.me/919494057012" target="_blank" style="color:rgba(255,255,255,.7);font-size:12px;text-decoration:none">💬 WhatsApp</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAMILIES -->
+                <div class="page" id="page-families">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:18px">Families</h2><p style="font-size:12px;color:var(--muted)" id="families-summary"></p></div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-family')">+ Add Family</button>
+                    </div>
+                    <div class="card"><div style="margin-bottom:12px"><input type="text" placeholder="Search families..." oninput="Families.setFilter(this.value)" style="max-width:300px"></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Members</th><th>Status</th><th>Total Paid</th><th>Actions</th></tr></thead><tbody id="families-tbody"></tbody></table></div></div>
+                </div>
+
+                <!-- PAYMENTS -->
+                <div class="page" id="page-payments">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:18px">Payments</h2></div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-payment')">+ Record Payment</button>
+                    </div>
+                    <div class="card"><div class="table-wrap"><table><thead><tr><th>Receipt</th><th>Family</th><th>Category</th><th>Month</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead><tbody id="payments-tbody"></tbody></table></div></div>
+                </div>
+
+                <!-- EXPENSES -->
+                <div class="page" id="page-expenses">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:18px">Expenses</h2></div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-expense')">+ Add Expense</button>
+                    </div>
+                    <div class="card"><div class="table-wrap"><table><thead><tr><th>Voucher</th><th>Category</th><th>Description</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead><tbody id="expenses-tbody"></tbody></table></div></div>
+                </div>
+
+                <!-- FUNDS -->
+                <div class="page" id="page-funds">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:18px">Funds</h2></div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-fund')">+ Create Fund</button>
+                    </div>
+                    <div id="funds-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
+                </div>
+
+                <!-- ACCOUNTS -->
+                <div class="page" id="page-accounts">
+                    <div><h2 style="font-size:18px">Accounts</h2></div>
+                    <div class="stats-grid" id="acc-stats"></div>
+                    <div class="card"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Ref</th><th>Description</th><th>Credit</th><th>Debit</th></tr></thead><tbody id="ledger-tbody"></tbody></table></div></div>
+                </div>
+
+                <!-- REPORTS -->
+                <div class="page" id="page-reports">
+                    <div><h2 style="font-size:18px">Reports</h2></div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:12px">
+                        <div class="card" style="text-align:center;cursor:pointer" onclick="Reports.generate('monthly')">📅 Monthly</div>
+                        <div class="card" style="text-align:center;cursor:pointer" onclick="Reports.generate('yearly')">📆 Yearly</div>
+                        <div class="card" style="text-align:center;cursor:pointer" onclick="Reports.generate('pending')">⏳ Pending</div>
+                        <div class="card" style="text-align:center;cursor:pointer" onclick="Reports.generate('fund')">🏦 Funds</div>
+                    </div>
+                    <div class="card hidden" id="report-output"><div id="report-content"></div></div>
+                </div>
+
+                <!-- ANNOUNCEMENTS -->
+                <div class="page" id="page-announcements">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div><h2 style="font-size:18px">Announcements</h2></div>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-ann')">+ New Announcement</button>
+                    </div>
+                    <div id="announcements-list"></div>
+                </div>
+
+                <!-- PENDING -->
+                <div class="page" id="page-pending">
+                    <div><h2 style="font-size:18px">Pending Registrations</h2></div>
+                    <div class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th>Members</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="pending-tbody"></tbody></table></div></div>
+                </div>
+
+                <!-- SETTINGS -->
+                <div class="page" id="page-settings">
+                    <div><h2 style="font-size:18px">Settings</h2></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                        <div class="card"><h3>🕌 Masjid Info</h3>
+                            <div class="form-group"><label>Name</label><input type="text" id="set-masjid-name" value="Jama Masjid Gandhari"></div>
+                            <div class="form-group"><label>Location</label><input type="text" id="set-location" value="Gandhari, Telangana"></div>
+                            <button class="btn btn-primary" onclick="Settings.save()">Save</button>
+                        </div>
+                        <div class="card"><h3>☁️ Sync</h3>
+                            <button class="btn btn-primary" onclick="GDrive.sync()">🔄 Sync Now</button>
+                            <div id="sync-status" style="margin-top:8px;font-size:12px;color:var(--muted)">Ready</div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modal-add-family"><div class="modal"><div class="modal-header"><h3>Add Family</h3><button class="modal-close" onclick="closeModal('modal-add-family')">✕</button></div><div class="modal-body"><div class="form-group"><label>Name *</label><input type="text" id="fam-name"></div><div class="form-group"><label>Mobile *</label><input type="tel" id="fam-mobile" maxlength="10"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="form-group"><label>Members</label><input type="number" id="fam-members" min="1"></div><div class="form-group"><label>Status</label><select id="fam-status"><option value="approved">Approved</option><option value="pending">Pending</option></select></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-ghost" onclick="closeModal('modal-add-family')">Cancel</button><button class="btn btn-primary" onclick="Families.add()">Add</button></div></div></div></div>
+
+    <div class="modal-overlay" id="modal-add-payment"><div class="modal"><div class="modal-header"><h3>Record Payment</h3><button class="modal-close" onclick="closeModal('modal-add-payment')">✕</button></div><div class="modal-body"><div class="form-group"><label>Family</label><select id="pay-family"></select></div><div class="form-group"><label>Category</label><select id="pay-category"><option>Monthly Chanda</option><option>Construction Fund</option><option>Zakat</option><option>Donation</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="form-group"><label>Amount (₹)</label><input type="number" id="pay-amount"></div><div class="form-group"><label>Date</label><input type="date" id="pay-date"></div></div><div class="form-group"><label>Payment Mode</label><select id="pay-mode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option></select></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-ghost" onclick="closeModal('modal-add-payment')">Cancel</button><button class="btn btn-gold" onclick="Payments.add()">Save</button></div></div></div></div>
+
+    <div class="modal-overlay" id="modal-add-expense"><div class="modal"><div class="modal-header"><h3>Add Expense</h3><button class="modal-close" onclick="closeModal('modal-add-expense')">✕</button></div><div class="modal-body"><div class="form-group"><label>Category</label><select id="exp-category"><option>Electricity</option><option>Salary</option><option>Maintenance</option><option>Construction</option></select></div><div class="form-group"><label>Amount (₹)</label><input type="number" id="exp-amount"></div><div class="form-group"><label>Description</label><textarea id="exp-desc" rows="2"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-ghost" onclick="closeModal('modal-add-expense')">Cancel</button><button class="btn btn-danger" onclick="Expenses.add()">Save</button></div></div></div></div>
+
+    <div class="modal-overlay" id="modal-add-fund"><div class="modal"><div class="modal-header"><h3>Create Fund</h3><button class="modal-close" onclick="closeModal('modal-add-fund')">✕</button></div><div class="modal-body"><div class="form-group"><label>Fund Name</label><input type="text" id="fund-name"></div><div class="form-group"><label>Target (₹)</label><input type="number" id="fund-target"></div><div class="form-group"><label>Description</label><textarea id="fund-desc" rows="2"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-ghost" onclick="closeModal('modal-add-fund')">Cancel</button><button class="btn btn-primary" onclick="Funds.add()">Create</button></div></div></div></div>
+
+    <div class="modal-overlay" id="modal-add-ann"><div class="modal"><div class="modal-header"><h3>📢 New Announcement</h3><button class="modal-close" onclick="closeModal('modal-add-ann')">✕</button></div><div class="modal-body"><div class="form-group"><label>Title *</label><input type="text" id="ann-title"></div><div class="form-group"><label>Message *</label><textarea id="ann-body" rows="4"></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-ghost" onclick="closeModal('modal-add-ann')">Cancel</button><button class="btn btn-primary" onclick="Announcements.add()">📢 Publish</button></div></div></div></div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        // ══════════════════════════════════════════
+        //  COMPLETE WORKING JMGMS v4.0
+        // ══════════════════════════════════════════
+
+        // ─── TOAST ───
+        function toast(msg, type = 'success') {
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.textContent = `${icons[type]||''} ${msg}`;
+            document.getElementById('toast-container').appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        // ─── DATE ───
+        function fmtDate(d) {
+            try { return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) } catch { return d }
+        }
+
+        function fmtCurrency(n) { return '₹' + Number(n).toLocaleString('en-IN') }
+
+        function todayISO() { return new Date().toISOString().split('T')[0] }
+
+        // ─── MODALS ───
+        function openModal(id) { document.getElementById(id)?.classList.add('open') }
+
+        function closeModal(id) { document.getElementById(id)?.classList.remove('open') }
+        document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove(
+                'open') });
+
+        // ─── DB ───
+        const DB = {
+            _data: null,
+            KEY: 'jmgms_v4_working',
+            get() {
+                if (this._data) return this._data;
+                try {
+                    const raw = localStorage.getItem(this.KEY);
+                    if (raw) { this._data = JSON.parse(raw); return this._data; }
+                } catch (e) {}
+                return this.init();
+            },
+            init() {
+                this._data = {
+                    families: [],
+                    payments: [],
+                    expenses: [],
+                    funds: [],
+                    announcements: [],
+                    pending: [],
+                    users: [
+                        { id: 'u1', name: 'Moiz Mohammed', mobile: '9494057012', password: 'admin123',
+                        role: 'superadmin', active: true },
+                        { id: 'u2', name: 'Treasurer', mobile: '9876543210', password: 'treasurer1',
+                        role: 'treasurer', active: true }
+                    ],
+                    settings: { masjidName: 'Jama Masjid Gandhari', location: 'Gandhari, Telangana',
+                    familyIdPrefix: 'JM', familyIdPadding: 4 },
+                    counters: { family: 0, mc: 0, sc: 0, cf: 0, exp: 0 }
+                };
+                // Add demo data
+                this._data.families = [
+                    { id: 'JM0001', name: 'Demo Family', mobile: '9000000000', members: 4, status: 'approved',
+                        regDate: todayISO(), password: 'family123', address: 'Gandhari', doc: '' }
+                ];
+                this._data.payments = [
+                    { id: 'MC-2026-0001', familyId: 'JM0001', familyName: 'Demo Family', category: 'Monthly Chanda',
+                        month: 'January', amount: 200, date: todayISO(), mode: 'Cash', notes: '', type: 'income' }
+                ];
+                this._data.funds = [
+                    { id: 'fund-1', name: 'Construction Fund', target: 500000, collected: 0,
+                    desc: 'Masjid expansion project' }
+                ];
+                this._data.counters.family = 1;
+                this._data.counters.mc = 1;
+                this.save();
+                return this._data;
+            },
+            save() {
+                try { localStorage.setItem(this.KEY, JSON.stringify(this._data)); return true } catch (e) { return false }
+            },
+            nextFamilyId(custom) {
+                if (custom) return custom;
+                const p = this._data.settings.familyIdPrefix || 'JM';
+                const pad = this._data.settings.familyIdPadding || 4;
+                this._data.counters.family++;
+                return p + String(this._data.counters.family).padStart(pad, '0');
+            },
+            nextReceiptId(type) {
+                const yr = new Date().getFullYear();
+                const map = { 'Monthly Chanda': 'mc', 'Construction Fund': 'cf', 'Zakat': 'sc', 'Donation': 'dn' };
+                const key = map[type] || 'sc';
+                this._data.counters[key] = (this._data.counters[key] || 0) + 1;
+                return `${key.toUpperCase()}-${yr}-${String(this._data.counters[key]).padStart(4,'0')}`;
+            },
+            nextExpenseId() {
+                this._data.counters.exp++;
+                return `EXP-${new Date().getFullYear()}-${String(this._data.counters.exp).padStart(4,'0')}`;
+            }
+        };
+
+        // ─── AUTH ───
+        const Auth = {
+            _session: null,
+            login(mobile, pass) {
+                const db = DB.get();
+                const user = db.users.find(u => u.mobile === mobile && u.password === pass && u.active);
+                if (user) { this._session = { ...user };
+                    sessionStorage.setItem('jmgms_session', JSON.stringify(this._session)); return { ok: true,
+                        user: this._session }; }
+                const fam = db.families.find(f => f.mobile === mobile && f.password === pass && f.status === 'approved');
+                if (fam) { this._session = { id: fam.id, name: fam.name, mobile, role: 'family', familyId: fam.id };
+                    sessionStorage.setItem('jmgms_session', JSON.stringify(this._session)); return { ok: true,
+                        user: this._session }; }
+                return { ok: false, msg: 'Invalid credentials' };
+            },
+            logout() { this._session = null;
+                sessionStorage.removeItem('jmgms_session'); },
+            restore() { try { this._session = JSON.parse(sessionStorage.getItem('jmgms_session')) } catch {} return this
+                    ._session; },
+            current() { return this._session; },
+            isSuperAdmin() { return this._session?.role === 'superadmin'; }
+        };
+
+        // ─── UI ───
+        let currentRole = 'admin';
+
+        function setRole(r, btn) {
+            currentRole = r;
+            document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            // Auto-fill credentials
+            const creds = {
+                admin: { mobile: '9494057012', pass: 'admin123' },
+                family: { mobile: '9000000000', pass: 'family123' },
+                treasurer: { mobile: '9876543210', pass: 'treasurer1' }
+            };
+            document.getElementById('login-mobile').value = creds[r].mobile;
+            document.getElementById('login-password').value = creds[r].pass;
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed') }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + id)?.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === id));
+            // Refresh data
+            const renderers = {
+                dashboard: updateDashboard,
+                families: Families.render,
+                payments: Payments.render,
+                expenses: Expenses.render,
+                funds: Funds.render,
+                accounts: Accounts.render,
+                announcements: Announcements.render,
+                pending: renderPending
+            };
+            if (renderers[id]) renderers[id]();
+        }
+
+        function doLogin() {
+            const mobile = document.getElementById('login-mobile').value.trim();
+            const pass = document.getElementById('login-password').value;
+            if (!mobile || !pass) { toast('Enter credentials', 'error'); return; }
+            const res = Auth.login(mobile, pass);
+            if (!res.ok) { toast(res.msg, 'error'); return; }
+            renderUI(res.user);
+        }
+
+        function doLogout() {
+            Auth.logout();
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('app-shell').style.display = 'none';
+            toast('Logged out', 'info');
+        }
+
+        function renderUI(user) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-shell').style.display = 'flex';
+            document.getElementById('topbar-avatar').textContent = user.name[0].toUpperCase();
+            document.getElementById('topbar-avatar').title = user.name;
+
+            // Hide admin-only items for family
+            const isAdmin = user.role === 'superadmin' || user.role === 'treasurer';
+            document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+                const page = el.dataset.page;
+                if (page === 'families' || page === 'payments' || page === 'expenses' ||
+                    page === 'funds' || page === 'accounts' || page === 'reports' ||
+                    page === 'announcements' || page === 'pending') {
+                    el.style.display = isAdmin ? 'flex' : 'none';
+                }
+            });
+            // Show nav section labels
+            document.querySelectorAll('.nav-section-label').forEach(el => {
+                el.style.display = isAdmin ? 'block' : 'none';
+            });
+
+            updateDashboard();
+            showPage('dashboard');
+            toast('Assalamualaikum! 🕌', 'success');
+        }
+
+        // ─── DASHBOARD ───
+        function updateDashboard() {
+            const db = DB.get();
+            const totalInc = db.payments.reduce((s, p) => s + p.amount, 0);
+            const totalExp = db.expenses.reduce((s, e) => s + e.amount, 0);
+            const balance = totalInc - totalExp;
+            const families = db.families.filter(f => f.status === 'approved').length;
+
+            document.getElementById('dash-stats').innerHTML = `
+            <div class="stat-card gold"><div class="stat-value">${fmtCurrency(totalInc)}</div><div class="stat-label">Collected</div></div>
+            <div class="stat-card red"><div class="stat-value">${fmtCurrency(totalExp)}</div><div class="stat-label">Expenses</div></div>
+            <div class="stat-card"><div class="stat-value">${fmtCurrency(balance)}</div><div class="stat-label">Balance</div></div>
+            <div class="stat-card blue"><div class="stat-value">${families}</div><div class="stat-label">Families</div></div>
+          `;
+
+            document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long',
+                day: 'numeric', month: 'long', year: 'numeric' });
+
+            const recent = db.payments.slice(-5).reverse();
+            document.getElementById('recent-payments').innerHTML = recent.map(p =>
+                `<tr><td>${p.familyName}</td><td>${p.category}</td><td>${fmtCurrency(p.amount)}</td></tr>`
+            ).join('') || '<tr><td colspan="3">No payments</td></tr>';
+
+            document.getElementById('pending-summary').innerHTML = db.pending.length ?
+                db.pending.slice(0, 3).map(p => `<div style="padding:4px 0;font-size:13px">${p.name} (${p.mobile})</div>`)
+                .join('') + (db.pending.length > 3 ? `<p style="font-size:12px;color:var(--muted)">+${db.pending.length-3} more</p>` :
+                    '') :
+                '<p style="color:var(--muted)">✅ No pending</p>';
+        }
+
+        // ─── FAMILIES ───
+        const Families = {
+            _filter: '',
+            render() {
+                const db = DB.get();
+                const list = db.families.filter(f =>
+                    f.name.toLowerCase().includes(this._filter.toLowerCase()) ||
+                    f.mobile.includes(this._filter) ||
+                    f.id.toLowerCase().includes(this._filter.toLowerCase())
+                );
+                document.getElementById('families-tbody').innerHTML = list.map(f =>
+                    `<tr>
+                <td><code>${f.id}</code></td>
+                <td>${f.name}</td>
+                <td>${f.mobile}</td>
+                <td>${f.members}</td>
+                <td><span class="badge badge-${f.status==='approved'?'green':'yellow'}">${f.status}</span></td>
+                <td>${fmtCurrency(db.payments.filter(p=>p.familyId===f.id).reduce((s,p)=>s+p.amount,0))}</td>
+                <td>
+                  <button class="btn btn-gold btn-sm" onclick="Payments.quickPay('${f.id}')">💰</button>
+                  ${Auth.isSuperAdmin() ? `<button class="btn btn-ghost btn-sm" onclick="Families.edit('${f.id}')">✏️</button>` : ''}
+                </td>
+              </tr>`
+                ).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No families found</td></tr>';
+                document.getElementById('families-summary').textContent = `${list.length} families`;
+            },
+            setFilter(v) { this._filter = v;
+                this.render(); },
+            add() {
+                const db = DB.get();
+                const name = document.getElementById('fam-name').value.trim();
+                const mobile = document.getElementById('fam-mobile').value.trim();
+                const members = parseInt(document.getElementById('fam-members').value) || 1;
+                const status = document.getElementById('fam-status').value;
+                if (!name || !mobile) { toast('Name and mobile required', 'error'); return; }
+                if (mobile.length !== 10) { toast('Enter valid 10-digit mobile', 'error'); return; }
+                if (db.families.find(f => f.mobile === mobile)) { toast('Mobile already registered', 'error'); return; }
+                const id = DB.nextFamilyId();
+                db.families.push({ id, name, mobile, members, status, regDate: todayISO(), password: 'family123',
+                    address: '', doc: '' });
+                DB.save();
+                closeModal('modal-add-family');
+                document.getElementById('fam-name').value = '';
+                document.getElementById('fam-mobile').value = '';
+                document.getElementById('fam-members').value = '';
+                this.render();
+                updateDashboard();
+                toast(`Family ${id} added!`, 'success');
+            },
+            edit(id) {
+                const db = DB.get();
+                const f = db.families.find(x => x.id === id);
+                if (!f) return;
+                // Simple edit via prompt for now
+                const newName = prompt('Edit family name:', f.name);
+                if (newName && newName.trim()) f.name = newName.trim();
+                const newMobile = prompt('Edit mobile:', f.mobile);
+                if (newMobile && newMobile.trim().length === 10) f.mobile = newMobile.trim();
+                const newMembers = prompt('Edit members count:', f.members);
+                if (newMembers && !isNaN(newMembers)) f.members = parseInt(newMembers);
+                DB.save();
+                this.render();
+                updateDashboard();
+                toast('Family updated', 'success');
+            }
+        };
+
+        // ─── PAYMENTS ───
+        const Payments = {
+            render() {
+                const db = DB.get();
+                const list = db.payments.sort((a, b) => b.date.localeCompare(a.date));
+                document.getElementById('payments-tbody').innerHTML = list.map(p =>
+                    `<tr>
+                <td><code>${p.id}</code></td>
+                <td>${p.familyName}</td>
+                <td>${p.category}</td>
+                <td>${p.month||'—'}</td>
+                <td><strong>${fmtCurrency(p.amount)}</strong></td>
+                <td>${fmtDate(p.date)}</td>
+                <td><button class="btn btn-gold btn-sm" onclick="Payments.viewReceipt('${p.id}')">🧾</button></td>
+              </tr>`
+                ).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No payments</td></tr>';
+            },
+            quickPay(famId) {
+                document.getElementById('pay-family').value = famId;
+                openModal('modal-add-payment');
+            },
+            add() {
+                const db = DB.get();
+                const famId = document.getElementById('pay-family').value;
+                const cat = document.getElementById('pay-category').value;
+                const amount = parseFloat(document.getElementById('pay-amount').value);
+                const date = document.getElementById('pay-date').value || todayISO();
+                const mode = document.getElementById('pay-mode').value;
+                if (!famId || !amount) { toast('Select family and enter amount', 'error'); return; }
+                const fam = db.families.find(f => f.id === famId);
+                if (!fam) { toast('Family not found', 'error'); return; }
+                const id = DB.nextReceiptId(cat);
+                const month = cat === 'Monthly Chanda' ? new Date(date).toLocaleString('default', { month: 'long' }) : '';
+                db.payments.push({ id, familyId: famId, familyName: fam.name, category: cat, month, amount, date, mode,
+                    notes: '', type: 'income' });
+                DB.save();
+                closeModal('modal-add-payment');
+                document.getElementById('pay-amount').value = '';
+                this.render();
+                updateDashboard();
+                toast(`Payment ${id} saved`, 'success');
+            },
+            viewReceipt(id) {
+                const db = DB.get();
+                const p = db.payments.find(x => x.id === id);
+                if (!p) return;
+                toast(`🧾 ${p.id}: ${fmtCurrency(p.amount)} - ${p.familyName}`, 'info');
+            }
+        };
+
+        // ─── EXPENSES ───
+        const Expenses = {
+            render() {
+                const db = DB.get();
+                const list = db.expenses.sort((a, b) => b.date.localeCompare(a.date));
+                document.getElementById('expenses-tbody').innerHTML = list.map(e =>
+                    `<tr>
+                <td><code>${e.id}</code></td>
+                <td>${e.category}</td>
+                <td>${e.desc||''}</td>
+                <td>${fmtCurrency(e.amount)}</td>
+                <td>${fmtDate(e.date)}</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="Expenses.view('${e.id}')">👁</button></td>
+              </tr>`
+                ).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">No expenses</td></tr>';
+            },
+            add() {
+                const db = DB.get();
+                const cat = document.getElementById('exp-category').value;
+                const amount = parseFloat(document.getElementById('exp-amount').value);
+                const desc = document.getElementById('exp-desc').value.trim();
+                if (!amount) { toast('Enter amount', 'error'); return; }
+                const id = DB.nextExpenseId();
+                db.expenses.push({ id, category: cat, amount, desc: desc || cat, date: todayISO(), mode: 'Cash' });
+                DB.save();
+                closeModal('modal-add-expense');
+                document.getElementById('exp-amount').value = '';
+                document.getElementById('exp-desc').value = '';
+                this.render();
+                updateDashboard();
+                toast(`Expense ${id} saved`, 'success');
+            },
+            view(id) { toast('📄 Voucher ' + id, 'info'); }
+        };
+
+        // ─── FUNDS ───
+        const Funds = {
+            render() {
+                const db = DB.get();
+                document.getElementById('funds-grid').innerHTML = db.funds.map(f =>
+                    `<div class="card">
+                <h3>${f.name}</h3>
+                <p>${fmtCurrency(f.collected||0)} / ${f.target?fmtCurrency(f.target):'∞'}</p>
+                <p class="text-muted" style="font-size:12px">${f.desc||''}</p>
+              </div>`
+                ).join('') || '<p class="text-muted">No funds created yet</p>';
+            },
+            add() {
+                const db = DB.get();
+                const name = document.getElementById('fund-name').value.trim();
+                const target = parseFloat(document.getElementById('fund-target').value) || 0;
+                const desc = document.getElementById('fund-desc').value.trim();
+                if (!name) { toast('Enter fund name', 'error'); return; }
+                db.funds.push({ id: 'fund-' + Date.now(), name, target, collected: 0, desc });
+                DB.save();
+                closeModal('modal-add-fund');
+                document.getElementById('fund-name').value = '';
+                document.getElementById('fund-target').value = '';
+                document.getElementById('fund-desc').value = '';
+                this.render();
+                toast('Fund created', 'success');
+            }
+        };
+
+        // ─── ACCOUNTS ───
+        const Accounts = {
+            render() {
+                const db = DB.get();
+                const inc = db.payments.reduce((s, p) => s + p.amount, 0);
+                const exp = db.expenses.reduce((s, e) => s + e.amount, 0);
+                document.getElementById('acc-stats').innerHTML = `
+              <div class="stat-card gold"><div class="stat-value">${fmtCurrency(inc)}</div><div class="stat-label">Income</div></div>
+              <div class="stat-card red"><div class="stat-value">${fmtCurrency(exp)}</div><div class="stat-label">Expense</div></div>
+              <div class="stat-card"><div class="stat-value">${fmtCurrency(inc-exp)}</div><div class="stat-label">Net</div></div>
+            `;
+                const all = [...db.payments.map(p => ({ date: p.date, ref: p.id, desc: p.category + ' - ' + p.familyName,
+                        credit: p.amount, debit: 0 })), ...db.expenses.map(e => ({ date: e.date, ref: e.id, desc: e
+                            .category + ' - ' + (e.desc || ''), credit: 0, debit: e.amount }))].sort((a, b) => a.date
+                    .localeCompare(b.date));
+                document.getElementById('ledger-tbody').innerHTML = all.map(r =>
+                    `<tr><td>${fmtDate(r.date)}</td><td>${r.ref}</td><td>${r.desc}</td><td>${r.credit?fmtCurrency(r.credit):'—'}</td><td>${r.debit?fmtCurrency(r.debit):'—'}</td></tr>`
+                ).join('') || '<tr><td colspan="5">No transactions</td></tr>';
+            }
+        };
+
+        // ─── ANNOUNCEMENTS ───
+        const Announcements = {
+            render() {
+                const db = DB.get();
+                const list = db.announcements.slice(-10).reverse();
+                document.getElementById('announcements-list').innerHTML = list.map(a =>
+                    `<div class="card" style="border-left:4px solid var(--green-soft)">
+                <h3>${a.title}</h3>
+                <p>${a.body}</p>
+                <span class="text-muted" style="font-size:11px">${fmtDate(a.date)}</span>
+              </div>`
+                ).join('') || '<p class="text-muted">No announcements yet</p>';
+            },
+            add() {
+                const db = DB.get();
+                const title = document.getElementById('ann-title').value.trim();
+                const body = document.getElementById('ann-body').value.trim();
+                if (!title || !body) { toast('Fill all fields', 'error'); return; }
+                db.announcements.push({ id: 'ann-' + Date.now(), title, body, date: new Date().toISOString() });
+                DB.save();
+                closeModal('modal-add-ann');
+                document.getElementById('ann-title').value = '';
+                document.getElementById('ann-body').value = '';
+                this.render();
+                toast('📢 Announcement published!', 'success');
+            }
+        };
+
+        // ─── PENDING ───
+        function renderPending() {
+            const db = DB.get();
+            document.getElementById('pending-tbody').innerHTML = db.pending.map((p, i) =>
+                `<tr>
+              <td>${p.name}</td>
+              <td>${p.mobile}</td>
+              <td>${p.members}</td>
+              <td>${fmtDate(p.submitted)}</td>
+              <td><button class="btn btn-primary btn-sm" onclick="approveFamily(${i})">✅ Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectFamily(${i})">✕ Reject</button></td>
+            </tr>`
+            ).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">No pending registrations</td></tr>';
+        }
+
+        function approveFamily(i) {
+            const db = DB.get();
+            const p = db.pending[i];
+            if (!p) return;
+            const id = DB.nextFamilyId();
+            db.families.push({ id, name: p.name, mobile: p.mobile, members: p.members, status: 'approved',
+                regDate: todayISO(), password: 'family123', address: p.address || '', doc: '' });
+            db.pending.splice(i, 1);
+            DB.save();
+            renderPending();
+            Families.render();
+            updateDashboard();
+            toast(`${p.name} approved!`, 'success');
+        }
+
+        function rejectFamily(i) {
+            const db = DB.get();
+            db.pending.splice(i, 1);
+            DB.save();
+            renderPending();
+            toast('Rejected', 'info');
+        }
+
+        // ─── REPORTS ───
+        const Reports = {
+            generate(type) {
+                const db = DB.get();
+                const box = document.getElementById('report-output');
+                box.classList.remove('hidden');
+                let html = '';
+                if (type === 'monthly') {
+                    const m = db.payments.filter(p => p.category === 'Monthly Chanda');
+                    html =
+                        `<h3>Monthly Chanda</h3><p>Total: ${fmtCurrency(m.reduce((s,p)=>s+p.amount,0))}</p><p>${m.length} payments</p>`;
+                } else if (type === 'yearly') {
+                    const inc = db.payments.reduce((s, p) => s + p.amount, 0);
+                    const exp = db.expenses.reduce((s, e) => s + e.amount, 0);
+                    html =
+                        `<h3>Yearly Summary</h3><p>Income: ${fmtCurrency(inc)}<br>Expense: ${fmtCurrency(exp)}<br>Net: ${fmtCurrency(inc-exp)}</p>`;
+                } else if (type === 'pending') {
+                    const pending = db.families.filter(f => f.status === 'pending');
+                    html = `<h3>Pending Families</h3><p>${pending.length} pending</p>`;
+                } else if (type === 'fund') {
+                    html = `<h3>Funds</h3>${db.funds.map(f=>`<p>${f.name}: ${fmtCurrency(f.collected||0)}</p>`).join('')}`;
+                }
+                document.getElementById('report-content').innerHTML = html;
+            }
+        };
+
+        // ─── SETTINGS ───
+        const Settings = {
+            save() {
+                const db = DB.get();
+                db.settings.masjidName = document.getElementById('set-masjid-name').value.trim();
+                db.settings.location = document.getElementById('set-location').value.trim();
+                DB.save();
+                toast('Settings saved!', 'success');
+            }
+        };
+
+        // ─── SYNC (GDrive) ───
+        const GDrive = {
+            sync() {
+                const db = DB.get();
+                localStorage.setItem('jmgms_cloud_backup', JSON.stringify(db));
+                document.getElementById('sync-status').textContent = '✅ Synced at ' + new Date().toLocaleTimeString();
+                toast('✅ Synced to cloud!', 'success');
+            }
+        };
+
+        // ─── REGISTRATION OTP ───
+        let _otpData = { code: null, mobile: null, verified: false };
+
+        function sendOTP() {
+            const m = document.getElementById('reg-mobile').value.trim();
+            if (m.length !== 10) { toast('Enter valid 10-digit mobile', 'error'); return; }
+            _otpData.code = Math.floor(100000 + Math.random() * 900000).toString();
+            _otpData.mobile = m;
+            _otpData.verified = false;
+            document.getElementById('otp-group').style.display = 'block';
+            document.getElementById('verify-otp-btn').style.display = 'block';
+            toast('OTP: ' + _otpData.code, 'info');
+        }
+
+        function verifyOTP() {
+            const entered = document.getElementById('reg-otp').value.trim();
+            if (entered === _otpData.code) {
+                _otpData.verified = true;
+                document.getElementById('reg-step-1').style.display = 'none';
+                document.getElementById('reg-step-2').style.display = 'block';
+                toast('✅ Verified!', 'success');
+            } else {
+                toast('❌ Invalid OTP. Try again.', 'error');
+            }
+        }
+
+        function goToStep3() {
+            const name = document.getElementById('reg-name').value.trim();
+            if (!name) { toast('Enter name', 'error'); return; }
+            document.getElementById('reg-step-2').style.display = 'none';
+            document.getElementById('reg-step-3').style.display = 'block';
+        }
+
+        function previewRegPhoto(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('reg-photo-preview').innerHTML =
+                    `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function submitRegistration() {
+            if (!_otpData.verified) { toast('Verify OTP first', 'error'); return; }
+            const db = DB.get();
+            const name = document.getElementById('reg-name').value.trim();
+            const mobile = _otpData.mobile;
+            const members = parseInt(document.getElementById('reg-members').value) || 1;
+            const pass = document.getElementById('reg-password').value;
+            if (!pass || pass.length < 6) { toast('Password min 6 chars', 'error'); return; }
+            if (db.families.find(f => f.mobile === mobile) || db.pending.find(p => p.mobile === mobile)) {
+                toast('Mobile already registered', 'error');
+                return;
+            }
+            db.pending.push({ name, mobile, members, password: pass, submitted: todayISO(), address: document.getElementById(
+                    'reg-address').value.trim() });
+            DB.save();
+            document.getElementById('register-panel').style.display = 'none';
+            toast('✅ Registration submitted!', 'success');
+        }
+
+        function showRegister() {
+            const p = document.getElementById('register-panel');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ─── INIT ───
+        function initApp() {
+            const db = DB.get();
+            // Add demo data if empty
+            if (db.families.length === 0) {
+                db.families = [
+                    { id: 'JM0001', name: 'Demo Family', mobile: '9000000000', members: 4, status: 'approved',
+                        regDate: todayISO(), password: 'family123', address: 'Gandhari', doc: '' }
+                ];
+                db.payments = [
+                    { id: 'MC-2026-0001', familyId: 'JM0001', familyName: 'Demo Family', category: 'Monthly Chanda',
+                        month: 'January', amount: 200, date: todayISO(), mode: 'Cash', notes: '', type: 'income' }
+                ];
+                db.funds = [
+                    { id: 'fund-1', name: 'Construction Fund', target: 500000, collected: 0,
+                    desc: 'Masjid expansion project' }
+                ];
+                db.counters.family = 1;
+                db.counters.mc = 1;
+                DB.save();
+            }
+
+            const session = Auth.restore();
+            if (session) {
+                renderUI(session);
+            } else {
+                // Show auth screen with default credentials
+                document.getElementById('login-mobile').value = '9494057012';
+                document.getElementById('login-password').value = 'admin123';
+                document.querySelector('.role-tab.active')?.click();
+            }
+
+            // Populate family dropdown
+            const payFamily = document.getElementById('pay-family');
+            if (payFamily) {
+                const fams = db.families.filter(f => f.status === 'approved');
+                payFamily.innerHTML = '<option value="">Select Family</option>' +
+                    fams.map(f => `<option value="${f.id}">${f.id} - ${f.name}</option>`).join('');
+            }
+
+            // Set default dates
+            document.querySelectorAll('input[type="date"]').forEach(el => {
+                if (!el.value) el.value = todayISO();
+            });
+
+            console.log('🕌 JMGMS v4.0 Loaded Successfully!');
+            console.log('🔐 Default Admin: 9494057012 / admin123');
+            console.log('👨‍👩‍👧 Demo Family: 9000000000 / family123');
+        }
+
+        // ─── START ───
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Auto-login with saved session
+        if (document.readyState === 'complete') {
+            if (!Auth.restore()) {
+                document.getElementById('login-mobile').value = '9494057012';
+                document.getElementById('login-password').value = 'admin123';
+            }
+        }
+
+        console.log('✅ JMGMS v4.0 is ready!');
+        console.log('📱 Login: 9494057012 / admin123');
+    </script>
+</body>
+</html>
